@@ -1,0 +1,796 @@
+/* 100vh trên điện thoại gồm cả thanh địa chỉ nên bị cắt đáy; dvh = chiều cao nhìn thấy thật */
+:root { --vh-unit: 100vh; }
+@supports (height: 100dvh) { :root { --vh-unit: 100dvh; } }
+
+:root {
+  --canvas-width: 1440;
+  --canvas-height: 1024;
+  --sky-top: #8ec9f0;
+  --sky-bottom: #eaf6ff;
+  --ipad-mini-rotate: -14deg;
+  --ipad-mini-skew: 1deg;
+  --room-ambient-darkness: 0;
+  --lamp-beam-left: -25%;
+  --lamp-beam-top: 34%;
+  --lamp-beam-width: 200%;
+  --lamp-beam-height: 75%;
+  --lamp-beam-rotate: -23deg;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  min-height: var(--vh-unit); height: var(--vh-unit); overflow: hidden;
+  overscroll-behavior: none; touch-action: manipulation; -webkit-text-size-adjust: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background-color: #4a3a2f;   
+}
+.scene {
+  /* PHÓNG TO KIỂU "COVER": phủ kín cửa sổ, phần dư ở mép bị cắt.
+     --zoom-max = mức phóng tối đa so với bản vừa khung (1 = như cũ, có dải đen). Tăng lên nếu muốn phủ kín hơn nữa, giảm nếu thấy bị cắt nhiều. */
+  --zoom-max: 1;   
+  --fit-w: min(100vw, calc(var(--vh-unit) * (var(--canvas-width) / var(--canvas-height))));
+  --cover-w: max(100vw, calc(var(--vh-unit) * (var(--canvas-width) / var(--canvas-height))));
+  position: relative; flex-shrink: 0;
+  width: min(var(--cover-w), calc(var(--fit-w) * var(--zoom-max)));
+  aspect-ratio: var(--canvas-width) / var(--canvas-height);
+  overflow: hidden;
+}
+.layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+
+/* ===================== ROOM ART (giữ nguyên toạ độ đã đo) ===================== */
+.bookshelf { right: 55%; top: 0; width: 187%; height: 79%; z-index: 1; }
+.book-1 { left: 93%; top: 2.5%; width: 6.9%; height: 12.2%; z-index: 2 }
+.book-2 { left: 87.43%; top: 17.2%; width: 12.5%; height: 12.25%; z-index: 2 }
+.book-3 { left: 88.3%; top: 32.6%; width: 11.25%; height: 9.52%; z-index: 2 }
+.book-4 { left: 90.8%; top: 45.7%; width: 10.31%; height: 13.72%; z-index: 2 }
+.book-5 { left: 87.98%; top: 61.52%; width: 13.15%; height: 18.45%; z-index: 2 }
+.plant-1 { left: 87.43%; top: 6.9%; width: 5.86%; height: 15.03%; z-index: 2 }
+.plant-2 { left: 95.90%; top: 30.5%; width: 4.47%; height: 12.15%; z-index: 3 }
+.box { left: 87.5%; top: 50.6%; width: 4.89%; height: 5.80%; z-index: 2 }
+.picture-1 { left: 95.76%; top: 49.80%; width: 4.75%; height: 5.80%; z-index: 2 }
+.wall { left: 0; top: 0; width: 100%; height: 100%; z-index: 0; }
+.door { left: 10.25%; top: 8%; width: 7.2%; height: 62%; }
+.roof { left: 13%; top: 0; width: 66.5%; height: 6.8%; }
+.window { left: 76.49%; top: 4.78%; width: 11%; height: 54.63%; z-index: 3; }
+.bed { left: 42.6%; top: 41.11%; width: 34.8%; height: 20.84%; }
+.board { left: 26.63%; top: 15.57%; width: 13.78%; height: 22%; }
+.shelf { left: 54.4%; top: 23.87%; width: 18.6%; height: 11.32%; }
+.plant-3 { left: 54.65%; top: 16.2%; width: 4.79%; height: 8.2%; }
+.picture-2 { left: 60.8%; top: 18.5%; width: 3.8%; height: 5.56%; }
+.earth { left: 66.6%; top: 14.3%; width: 5.39%; height: 9.78%; }
+.rubic { left: 69.0%; top: 31.83%; width: 2.2%; height: 2.06%; }
+.picture-3 { left: 64.4%; top: 29.17%; width: 2.7%; height: 4.78%; }
+.book-6 { left: 58.19%; top: 31.4%; width: 4.3%; height: 2.58%; }
+.hook { left: 0.5%; top: 21.87%; width: 8.10%; height: 5.22%; }
+.cap { left: 5.69%; top: 24.12%; width: 3.95%; height: 11.91%; z-index: 2; }
+.bag { right: 0.69%; top: 22.75%; width: 6.9%; height: 25.47%; z-index: 2; }
+.table { right: 100%; top: 61%; width: 100%; height: 40%; z-index: 3; }
+.alarm { left: 74.37%; top: 80.85%; width: 11.73%; height: 12.30%; z-index: 3 }
+.book-11 { right: 0.69%; top: 71.67%; width: 13.88%; height: 28.41%; z-index: 3 }
+.book-8 { left: 33.12%; top: 78.51%; width: 32.32%; height: 20.16%; z-index: 3 }
+.book-9 { left: 28.47%; top: 63.28%; width: 20.69%; height: 13.96%; z-index: 3 }
+.book-10 { left: 50.55%; top: 63.18%; width: 19.86%; height: 14.06%; z-index: 3 }
+.group-pencilcase { left: 73.61%; top: 63.18%; width: 6.6%; height: 20.31%; z-index: 3 }
+.group-plant-5 { left: 86.3%; top: 73.63%; width: 10.625%; height: 24.70%; z-index: 3 }
+.group-cup { left: 64.93%; top: 75%; width: 8.31%; height: 12.01%; z-index: 4 }
+.cabinet { left: 31.1%; top: 51.17%; width: 12.98%; height: 10.79%; }
+.book-7 { left: 32.5%; top: 49.21%; width: 4.7%; height: 3.51%; }
+.cup-1 { left: 39.58%; top: 49%; width: 2.92%; height: 3.66%; }
+.lamp-1 { left: 35.8%; top: 40.91%; width: 5.2%; height: 11.32%; }
+.plant-4 { right: 0.69%; top: 54.78%; width: 9.09%; height: 22.46%; }
+
+/* ===================== ĐÈN BÀN — click bật/tắt (cũng tự bật khi tối/mưa) ===================== */
+.lamp-wrapper { left: 13.81%; top: 25.97%; width: 23.95%; height: 44.23%; z-index: 3; }
+.lamp-img { width: 100%; height: 100%; display: block; pointer-events: none; }
+
+/* ===================== ĐÈN BÀN — ÁNH SÁNG ===================== */
+
+
+.lamp-light-beam {
+    position: absolute;
+
+    left: 13%;
+    top: 33.52%;
+
+    width: 125%;
+    height: 100%;
+
+    background: radial-gradient(
+        ellipse at 50% 0%,
+        rgba(255, 222, 145, 0.48) 0%,
+        rgba(255, 226, 165, 0.30) 35%,
+        rgba(255, 235, 195, 0.12) 68%,
+        transparent 100%
+    );
+
+    clip-path: polygon(
+        42% 0%,
+        58% 0%,
+        100% 100%,
+        0% 100%
+    );
+
+    transform: rotate(-25deg);
+    transform-origin: 50% 0%;
+
+    opacity: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    transition: opacity 0.4s ease;
+    z-index: 1;
+}
+
+.lamp-wrapper.lit .lamp-light-beam {
+    opacity: 1;
+}
+
+
+/* ===================== OVERLAY TỐI THEO GIỜ/THỜI TIẾT ===================== */
+.room-ambient-overlay {
+  position: absolute; inset: 0;
+  background: #0b1020; opacity: var(--room-ambient-darkness);
+  pointer-events: none; transition: opacity 3s ease; z-index: 40;
+}
+
+/* ===================== IPAD TRÊN BÀN ===================== */
+.ipad-wrapper { left: 17.08%; top: 59.18%; width: 23.81%; height: 25.97%; z-index: 3; }
+.ipad-img { width: 100%; height: 100%; display: block; pointer-events: none; }
+.ipad-mini-screen {
+  position: absolute; left: 15%; top: 13%; width: 74%; height: 68%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: -apple-system, "Segoe UI", sans-serif; font-size: 25px; font-variant-numeric: tabular-nums;
+  pointer-events: none; transform-origin: center center;
+  transform: rotate(var(--ipad-mini-rotate)) skewY(var(--ipad-mini-skew));
+}
+#miniPhaseLabel { font-size: 8px; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.6; }
+
+.clickable { pointer-events: auto; cursor: pointer; transition: transform 0.15s ease; }
+.clickable:hover { transform: scale(1.04); }
+
+.notif-badge {
+  position: absolute; top: -4%; right: -4%; width: 14%; aspect-ratio: 1;
+  border-radius: 50%; background: #ff5a5a; display: none;
+}
+.notif-badge.show { display: block; }
+
+.ipad-bubble {
+  position: absolute; left: 50%; bottom: 102%;
+  transform: translateX(-50%) translateY(6px);
+  width: max-content; max-width: 42%;
+  background: #fff; color: #1a1a1a;
+  font-family: -apple-system, "Segoe UI", sans-serif; font-size: 0.7vw; font-weight: 600; line-height: 1.35;
+  padding: 1.2% 1.8%; border-radius: 10px; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25); text-align: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease; z-index: 10;
+}
+.ipad-bubble::after {
+  content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  border: 6px solid transparent; border-top-color: #fff;
+}
+.ipad-bubble.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ===================== IPAD POPUP ===================== */
+.ipad-overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.45); opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease; z-index: 50;
+}
+.ipad-overlay.open { opacity: 1; pointer-events: auto; }
+
+.ipad-frame {
+  width: 62%; aspect-ratio: 1063 / 685;
+  background: #2b2b2e; border-radius: 4% / 6%; padding: 2.2% 1.8%;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  transform: scale(0.2); transform-origin: var(--ipad-x, 50%) var(--ipad-y, 50%);
+  transition: transform 0.35s ease;
+}
+.ipad-overlay.open .ipad-frame { transform: scale(1); }
+
+.ipad-content {
+  position: relative; width: 100%; height: 100%; overflow: hidden;
+  background: #111214; border-radius: 3% / 4.5%; color: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  gap: 12px; padding: 5% 5% 4%;
+  font-family: -apple-system, "Segoe UI", sans-serif;
+}
+.btn-close {
+  position: absolute; top: 3%; right: 3%; width: 30px; height: 30px;
+  border: none; border-radius: 50%; background: rgba(255, 255, 255, 0.12);
+  color: #fff; font-size: 18px; cursor: pointer; z-index: 5;
+}
+.btn-close:hover { background: rgba(255, 255, 255, 0.22); }
+
+#stopwatchDisplay, #pomodoroDisplay {
+  font-size: clamp(28px, 5vw, 52px); font-variant-numeric: tabular-nums; letter-spacing: 2px;
+}
+.nudge-message {
+  position: absolute; bottom: 6%; left: 6%; right: 6%;
+  background: rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px 16px;
+  font-size: 14px; text-align: center;
+}
+
+/* tabs: Flow , Pomodoro , Profile , Chat */
+.mode-tabs { display: flex; gap: 8px; width: 100%; }
+.mode-tab {
+  position: relative; flex: 1; padding: 10px 0;
+  border: none; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.6);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.mode-tab.active { background: #4f8ef7; color: #fff; }
+.tab-dot { position: absolute; top: 3px; right: 5px; width: 8px; height: 8px; border-radius: 50%; background: #ff5a5f; }
+
+.mode-panel {
+  width: 100%; flex: 1; min-height: 0; overflow-y: auto;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
+.mode-panel::-webkit-scrollbar { width: 4px; }
+.mode-panel::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+
+.mode-panel[hidden], .goal-bar[hidden], .chat-locked[hidden], .chat-body[hidden],
+.buddy-goal-line[hidden], .buddy-goal-note[hidden], .sum-goal[hidden], .sum-actions[hidden],
+.tab-dot[hidden], .category-panel[hidden] { display: none !important; }
+
+.timer-controls { display: flex; gap: 12px; }
+.timer-controls button { padding: 10px 26px; border: none; border-radius: 999px; font-size: 14px; cursor: pointer; }
+#btnStart, #btnPomodoroStart { background: #4f8ef7; color: #fff; }
+#btnStart:hover, #btnPomodoroStart:hover { background: #3d7ce0; }
+#btnStop, #btnPomodoroStop, #btnReset, #btnPomodoroReset { background: rgba(255, 255, 255, 0.1); color: #fff; }
+#btnStop:hover, #btnPomodoroStop:hover, #btnReset:hover, #btnPomodoroReset:hover { background: rgba(255, 255, 255, 0.18); }
+
+.auto-suggest-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 12px; color: rgba(255, 255, 255, 0.75); }
+.auto-suggest-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+.toggle-box {
+  position: relative; width: 16px; height: 16px; flex-shrink: 0; border-radius: 4px;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.auto-suggest-toggle input:checked + .toggle-box { background: #4f8ef7; border-color: #4f8ef7; }
+.auto-suggest-toggle input:checked + .toggle-box::after {
+  content: ""; position: absolute; left: 4px; top: 1px; width: 4px; height: 8px;
+  border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg);
+}
+
+.pomodoro-settings { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.setting-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px 14px; }
+.setting-row label { font-size: 13px; color: rgba(255, 255, 255, 0.8); }
+.setting-row input[type="number"] {
+  width: 50px; text-align: center; margin-left: auto; margin-right: 6px; padding: 4px;
+  background: rgba(255, 255, 255, 0.1); border: none; border-radius: 6px; color: #fff; font-size: 13px;
+}
+.setting-row .unit { font-size: 12px; color: rgba(255, 255, 255, 0.5); }
+.phase-label { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255, 255, 255, 0.55); }
+.cycle-label { font-size: 12px; color: rgba(255, 255, 255, 0.5); margin-top: -8px; }
+.pomodoro-settings input:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ----- mục tiêu của phiên ----- */
+.goal-bar { width: 100%; display: flex; flex-direction: column; gap: 4px; }
+.goal-bar input {
+  width: 100%; padding: 7px 12px; border-radius: 10px; font-size: 13px; color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.08);
+}
+.goal-bar input::placeholder { color: rgba(255, 255, 255, 0.45); }
+.buddy-goal-line { font-size: 12px; color: rgba(255, 255, 255, 0.65); }
+
+/* ----- chat ----- */
+.chat-panel > * { width: 100%; }
+.chat-status { font-size: 12px; color: rgba(255, 255, 255, 0.6); }
+.chat-locked {
+  padding: 28px 12px; text-align: center; font-size: 13px;
+  border-radius: 12px; background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.75);
+}
+.chat-body { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; }
+.chat-log {
+  flex: 1; min-height: 80px; overflow-y: auto; padding: 8px; border-radius: 12px;
+  display: flex; flex-direction: column; gap: 6px; background: rgba(255, 255, 255, 0.06);
+}
+.chat-msg { max-width: 80%; padding: 6px 11px; font-size: 13px; line-height: 1.35; border-radius: 14px; word-break: break-word; }
+.chat-msg.me   { align-self: flex-end;   background: #4f8ef7; color: #fff; border-bottom-right-radius: 4px; }
+.chat-msg.them { align-self: flex-start; background: rgba(255, 255, 255, 0.14); color: #fff; border-bottom-left-radius: 4px; }
+.chat-input-row { display: flex; gap: 8px; }
+.chat-input-row input {
+  flex: 1; min-width: 0; padding: 8px 12px; border-radius: 999px; font-size: 13px; color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.08);
+}
+.chat-input-row button, .sum-actions button {
+  padding: 8px 16px; border: none; border-radius: 999px; background: #4f8ef7; color: #fff; font-size: 13px; cursor: pointer;
+}
+.sum-actions button.ghost { background: rgba(255, 255, 255, 0.14); }
+
+/* ----- recap cuối phiên ----- */
+.summary-panel { text-align: center; color: #fff; }
+.summary-panel h3 { font-size: 16px; font-weight: 700; }
+.sum-big { font-size: 40px; font-weight: 700; line-height: 1; }
+.sum-line { font-size: 13px; color: rgba(255, 255, 255, 0.7); }
+.sum-goal { width: 100%; padding: 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.08); font-size: 13px; }
+.sum-actions { display: flex; gap: 8px; justify-content: center; margin-top: 6px; }
+
+/* ===================== SKY / WEATHER ===================== */
+.sky {
+  position: absolute; left: 76.49%; top: 4.78%; width: 11%; height: 54.63%;
+  z-index: 2; overflow: hidden; pointer-events: none;
+  clip-path: polygon(20% 15%, 94% 3%, 94% 98%, 20% 87%);
+  background: linear-gradient(to bottom, var(--sky-top), var(--sky-bottom));
+  transition: background 3s ease;
+}
+.weather-fx { position: absolute; inset: 0; overflow: hidden; }
+
+
+.drop {
+  position: absolute; top: -8%; width: 1px; height: 5%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.6));
+  animation: fall linear infinite;
+}
+@keyframes fall { to { transform: translateY(2200%) rotate(12deg); } }
+
+.flake {
+  position: absolute; top: -5%; width: 5px; height: 5px; border-radius: 50%;
+  background: #fff; opacity: 0.85; animation: snowfall linear infinite;
+}
+@keyframes snowfall {
+  from { top: -5%;  transform: translateX(0); }
+  to   { top: 105%; transform: translateX(18px); }
+}
+
+
+.cloud { position: absolute; left: -100%; aspect-ratio: 120 / 56; animation: drift linear infinite; pointer-events: none; }
+.cloud svg { display: block; width: 100%; height: 100%; }
+@keyframes drift { from { left: -100%; } to { left: 100%; } }
+.sky[data-period="night"] .cloud, .sky[data-period="night2"] .cloud { filter: brightness(0.35); }
+.sky[data-period="evening"] .cloud { filter: brightness(0.65); }
+
+
+.fog-band {
+  position: absolute; left: -20%; width: 140%; height: 22%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  filter: blur(10px); animation: fogSlide 18s ease-in-out infinite alternate;
+}
+@keyframes fogSlide { from { transform: translateX(-8%); } to { transform: translateX(8%); } }
+
+
+.sky[data-period="night"] .weather-fx::before,
+.sky[data-period="night2"] .weather-fx::before {
+  content: ""; position: absolute; inset: 0; opacity: 0.8;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, #fff, transparent), radial-gradient(1px 1px at 60% 15%, #fff, transparent),
+    radial-gradient(1px 1px at 80% 55%, #fff, transparent), radial-gradient(1px 1px at 35% 70%, #fff, transparent);
+}
+
+/* ===================== AVATAR SYSTEM (preview / buddy / hand) ===================== */
+.avatar-preview, .avatar-slot { position: relative; width: 100%; height: 100%; }
+
+.avatar-preview {
+  width: 100% !important; aspect-ratio: 1 / 1; overflow: hidden; isolation: isolate;
+  background: #fff; border-radius: 50%; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+}
+.avatar-preview .buddy-part { transform: none !important; }
+
+.avatar-canvas { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
+.buddy-part { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.buddy-part svg { display: block; width: 100%; height: 100%; }
+.avatar-body, .avatar-arms { position: absolute; inset: 0; isolation: isolate; }
+.buddy-part[data-part="hoodieHat"]  { z-index: 0; }
+.buddy-part[data-part="hairBack"]   { z-index: 1; }
+.buddy-part[data-part="skin"]       { z-index: 2; }
+.buddy-part[data-part="outfit"]     { z-index: 3; }
+.buddy-part[data-part="hairFront"]  { z-index: 4; }
+.buddy-part[data-part="expression"] { z-index: 5; }
+
+/* ===================== PROFILE ===================== */
+#panelProfile { position: relative; padding: 16px 12px; border-radius: 16px; background: #fdf6e3; color: #4a3f2a; }
+#panelProfile .avatar-preview { background: #DDEFF2 !important; }
+#panelProfile .avatar-canvas { left: -5%; top: -2%; width: 110%; height: 110%; }
+
+.profile-layout { display: flex; gap: 16px; width: 100%; align-items: flex-start; }
+.profile-avatar-col { position: relative; z-index: 1; flex: 0 0 38%; min-width: 0; }
+.profile-controls-col { position: relative; z-index: 20; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; pointer-events: auto; }
+
+.category-tabs { position: relative; z-index: 30; display: flex; flex-direction: column; gap: 6px; }
+.category-tab {
+  position: relative; z-index: 31; text-align: left; padding: 9px 14px;
+  border: none; border-radius: 10px; background: rgba(0, 0, 0, 0.06); color: #6b5d42;
+  font-size: 13px; font-weight: 700; cursor: pointer; pointer-events: auto;
+}
+.category-tab.active { background: #6bc26b; color: #fff; }
+
+.category-panel { position: relative; z-index: 30; display: flex; flex-direction: column; gap: 8px; pointer-events: auto; }
+.picker-row { position: relative; z-index: 30; display: flex; gap: 8px; width: 100%; overflow-x: auto; padding-bottom: 4px; pointer-events: auto; }
+.picker-thumb {
+  position: relative; z-index: 31; flex-shrink: 0; width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  background: #fff; border: 2px solid #e8dcc0; border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); cursor: pointer; pointer-events: auto;
+}
+.picker-thumb:hover { transform: scale(1.04); }
+.picker-thumb.selected { border-color: #6bc26b; transform: scale(1.08); }
+.picker-thumb svg { display: block; width: 100%; height: 100%; pointer-events: none; }
+.picker-row.swatches .picker-thumb { width: 28px; height: 28px; border-radius: 50%; }
+
+#panelProfile #btnSaveAvatar {
+  position: relative; z-index: 30; margin-top: 12px; padding: 10px 30px;
+  border: none; border-radius: 999px; background: #6bc26b; color: #fff;
+  font-size: 14px; font-weight: 700; box-shadow: 0 3px 0 #4a9a4a; cursor: pointer; pointer-events: auto;
+}
+#panelProfile #btnSaveAvatar:active { transform: translateY(2px); box-shadow: 0 1px 0 #4a9a4a; }
+
+/* ===================== BÀN TAY VIẾT (mình + buddy) ===================== */
+/* Mọi toạ độ ở đây chỉ là giá trị mặc định: bấm "Customize Desk" rồi kéo / resize cho khớp là được. */
+.my-hand {
+  left: 52.7%; top: 78%; width: 36%;
+  height: auto; /* ghi đè height:100% của .layer, nếu không aspect-ratio bị bỏ qua */
+  aspect-ratio: 2 / 1; z-index: 6; opacity: 0; transition: opacity 0.3s ease;
+  transform-origin: 18% 42%; /* ≈ đầu bút: tay xoay quanh điểm này nên bút luôn chạm giấy */
+}
+.my-hand.show { opacity: 1; animation: handWrite 0.9s ease-in-out infinite; }
+
+/* viết: tay nhấc lên - hạ xuống, hơi nghiêng */
+@keyframes handWrite {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(-1.5%, -5%) rotate(-1.5deg); }
+  40% { transform: translate(1%, 1.5%) rotate(0.8deg); }
+  60% { transform: translate(-1.2%, -4%) rotate(-1deg); }
+  80% { transform: translate(0.8%, 2%) rotate(0.6deg); }
+}
+
+/* tay buddy: cùng SVG, xoay 180°. Nằm DƯỚI avatar (z4 < z5) nên đầu cánh tay chui vào sau thân buddy */
+.buddy-hand {
+  left: 38.9%; top: 54.5%; width: 24%;
+  height: auto; aspect-ratio: 2 / 1; z-index: 4; opacity: 0; transition: opacity 0.3s ease;
+  transform-origin: 81% 58%;
+}
+.buddy-hand .avatar-slot { transform: rotate(180deg); }
+.buddy-hand.show { opacity: 1; animation: handWrite 0.9s ease-in-out 0.2s infinite; }
+
+/* ===================== BUDDY NGỒI ĐỐI DIỆN ===================== */
+/* ↕ LÊN / XUỐNG: chỉnh `top` (số càng lớn buddy càng thấp). ↔ chỉnh `left`. To / nhỏ: `width` + `height` (giữ hộp vuông).
+   Hộp này CỐ Ý không có z-index / opacity / animation, để không tạo "stacking context". Nhờ vậy 2 nhóm bên trong
+   xếp lớp thẳng với cái bàn:
+     .avatar-body  z2 < bàn z3  -> mép bàn che phần thân dưới (buddy ngồi SAU bàn)
+     .avatar-arms  z6 > bàn z3  -> tay nằm TRÊN mặt bàn / quyển sách */
+.buddy-across-desk { left: 23.29%; top: 10.72%; width: 53.42%; height: 75.68%; }   /* to hơn 6%, giữ đáy (chỗ ngồi) và tâm ngang */
+
+.buddy-across-desk .avatar-body, .buddy-across-desk .avatar-arms {
+  opacity: 0; transition: opacity 0.4s ease; transform-origin: bottom center;
+}
+.buddy-across-desk .avatar-body { z-index: 2; }
+.buddy-across-desk .avatar-arms { z-index: 6; }
+.buddy-across-desk.show .avatar-body,
+.buddy-across-desk.show[data-anim="working"] .avatar-arms { opacity: 1; }   /* tay chỉ hiện khi buddy đang học */
+
+/* animation áp lên CẢ HAI nhóm, cùng nhịp, nên tay luôn dính vai */
+.buddy-across-desk.show .avatar-body, .buddy-across-desk.show .avatar-arms { animation: buddyBreathe 4s ease-in-out infinite; }
+@keyframes buddyBreathe { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.5%); } }
+
+/* đang học: thỉnh thoảng cúi đầu nhẹ xuống rồi ngẩng lên (thân + tay cùng nhịp nên tay luôn dính vai) */
+.buddy-across-desk[data-anim="working"] .avatar-body, .buddy-across-desk[data-anim="working"] .avatar-arms { animation: buddyStudy 7s ease-in-out infinite; }
+@keyframes buddyStudy {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30%, 55% { transform: translateY(1.6%) rotate(0.5deg); }   /* cúi: tăng 1.6% nếu muốn cúi sâu hơn */
+  80%      { transform: translateY(0.2%) rotate(0deg); }
+}
+.buddy-across-desk[data-anim="resting"] .avatar-body, .buddy-across-desk[data-anim="resting"] .avatar-arms { animation: buddyStretch 2.6s ease-in-out infinite; }
+@keyframes buddyStretch { 0%, 100% { transform: scaleY(1) translateY(0); } 50% { transform: scaleY(1.035) translateY(-3%); } }
+
+.buddy-status-badge {
+  position: absolute; left: 50%; top: 9%; transform: translateX(-50%); z-index: 7;
+  padding: 0.2em 0.8em; border-radius: 999px; white-space: nowrap;
+  background: rgba(0, 0, 0, 0.55); color: #fff;
+  font: 600 clamp(9px, 0.9vw, 13px) -apple-system, "Segoe UI", sans-serif;
+}
+.buddy-across-desk:not(.show) .buddy-status-badge { display: none; }
+.buddy-status-badge.studying, .buddy-status-badge.focusing { background: #4f8ef7; }
+.buddy-status-badge.break, .buddy-status-badge.longBreak { background: #34c759; }
+
+/* chế độ Customize Desk: hiện mờ để kéo chỉnh kể cả khi chưa có buddy / chưa bấm timer */
+.scene.edit-mode .buddy-hand, .scene.edit-mode .my-hand { opacity: 0.75; }
+.scene.edit-mode .buddy-across-desk .avatar-body, .scene.edit-mode .buddy-across-desk .avatar-arms { opacity: 0.75; }
+.scene.edit-mode .buddy-hand, .scene.edit-mode .my-hand { z-index: 8; }
+
+/* sticky note: buddy đang làm gì */
+.buddy-goal-note {
+  position: absolute; left: 50%; top: -6%; z-index: 7; max-width: 90%;
+  transform: translateX(-50%) rotate(-3deg); padding: 0.3em 0.7em;
+  background: #fff4a8; color: #4a3f2a; border-radius: 3px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  font-size: clamp(8px, 0.9vw, 14px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.buddy-goal-note.done { text-decoration: line-through; opacity: 0.75; }
+
+/* ===================== NÚT ÂM THANH MƯA ===================== */
+.sound-toggle {
+  position: fixed; left: 12px; bottom: 12px; z-index: 60;
+  padding: 6px 12px; border: none; border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45); color: #fff; font-size: 12px; cursor: pointer;
+}
+.sound-toggle:hover { background: rgba(0, 0, 0, 0.6); }
+
+/* ===================== TUỲ BIẾN VỊ TRÍ ĐỒ VẬT ===================== */
+.decor-img { width: 100%; height: 100%; display: block; pointer-events: none; }
+
+#btnToggleEditDesk {
+  position: fixed; top: 12px; left: 12px; z-index: 60;
+  padding: 8px 16px; border: none; border-radius: 999px;
+  background: #4f8ff7; color: #fff;
+  font-family: -apple-system, sans-serif; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+#btnToggleEditDesk.active { background: #34c759; }
+
+.scene.edit-mode .decor-item { pointer-events: auto; cursor: grab; outline: 2px dashed rgba(79, 142, 247, 0.85); outline-offset: 2px; }
+.scene.edit-mode .decor-item:active { cursor: grabbing; }
+.resize-handle { display: none; }
+.scene.edit-mode .decor-item .resize-handle {
+  display: block; position: absolute; right: -7px; bottom: -7px; z-index: 5;
+  width: 14px; height: 14px; background: #4f8ef7; border: 2px solid #fff; border-radius: 50%;
+  cursor: nwse-resize; pointer-events: auto;
+}
+.buddy-hand { display: none !important; }   /* ẩn bàn tay CSS cũ */
+
+.buddy-part[data-part="armSleeve"] { z-index: 1; }
+.buddy-part[data-part="armSkin"]   { z-index: 2; }
+.buddy-part[data-part="armSleeve"], .buddy-part[data-part="armSkin"] { transform-origin: 62% 60%; } /* ≈ vai: chỉnh nếu tay xoay lạ */
+.buddy-across-desk[data-anim="working"] .buddy-part[data-part="armSleeve"],
+.buddy-across-desk[data-anim="working"] .buddy-part[data-part="armSkin"] { animation: armWrite 0.9s ease-in-out infinite; }
+@keyframes armWrite {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(-0.4%, -1.4%) rotate(-1.2deg); }
+  50% { transform: translate(0.3%, 0.5%) rotate(0.6deg); }
+  75% { transform: translate(-0.3%, -1%) rotate(-0.8deg); }
+}
+
+/* ===================== TÊN + MOTTO CỦA BUDDY ===================== */
+.buddy-name-tag {
+  position: absolute; left: 50%; top: 2%; transform: translateX(-50%); z-index: 7;
+  padding: 0.15em 0.8em; border-radius: 999px; white-space: nowrap;
+  background: #fff; color: #2b2b2e; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  font: 700 clamp(10px, 1vw, 15px) -apple-system, "Segoe UI", sans-serif;
+}
+.buddy-name-tag:empty, .buddy-motto-bubble:empty { display: none; }
+.buddy-across-desk:not(.show) .buddy-name-tag, .buddy-across-desk:not(.show) .buddy-hover-zone { display: none; }
+
+/* vùng hover nhỏ quanh đầu + thân trên (không phủ cả hộp, để không chặn click iPad / đèn phía sau) */
+.buddy-hover-zone { position: absolute; left: 33%; top: 6%; width: 34%; height: 46%; z-index: 8; pointer-events: auto; }
+
+.buddy-motto-bubble {
+  position: absolute; left: 68%; top: 14%; z-index: 9; width: max-content; max-width: 30%;
+  padding: 0.5em 0.9em; border-radius: 14px; background: #fff; color: #2b2b2e;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25); text-align: center; line-height: 1.35;
+  font: 600 clamp(10px, 0.95vw, 15px) -apple-system, "Segoe UI", sans-serif;
+  opacity: 0; transform: translateY(6px); pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.buddy-motto-bubble::after {   /* đuôi bong bóng chỉ về phía buddy */
+  content: ""; position: absolute; right: 100%; top: 40%;
+  border: 6px solid transparent; border-right-color: #fff;
+}
+.buddy-hover-zone:hover + .buddy-motto-bubble { opacity: 1; transform: translateY(0); }
+
+/* ----- Profile: ô nhập tên / motto ----- */
+.field-label { font-size: 12px; font-weight: 700; color: #6b5d42; }
+.profile-input {
+  width: 100%; padding: 8px 12px; border-radius: 10px; font-size: 13px;
+  border: 2px solid #e8dcc0; background: #fff; color: #4a3f2a;
+}
+.profile-input:focus { outline: none; border-color: #6bc26b; }
+
+/* ===================== NÚT COPY LINK MỜI BẠN ===================== */
+.copy-link {
+  position: fixed; top: 12px; right: 12px; z-index: 60;
+  padding: 8px 16px; border: none; border-radius: 999px;
+  background: #4f8ff7; color: #fff; cursor: pointer;
+  font-family: -apple-system, "Segoe UI", sans-serif; font-size: 13px; font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.copy-link:hover { background: #3d7de0; }
+.copy-link.done { background: #34c759; }
+/* ===================== MÈO MASCOT (assets/cat) =====================
+   Toạ độ bên trong dùng "đơn vị gốc" của file SVG, stage = 290 x 290 (đổi % = đơn vị / 290).
+   Mặt đất chung: y = 288. Pose ngủ & thức cùng đứng trên đường này nên crossfade không bị nhảy. */
+.cat { left: 64.5%; top: 43%; width: 10.4%; height: 14.8%; z-index: 30; container-type: size; }
+.cat-stage {
+  position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+  width: min(100cqw, 100cqh); height: min(100cqw, 100cqh);   /* luôn vuông, không méo khi kéo resize */
+  pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.scene.edit-mode .cat-stage { cursor: grab; }
+.cat-stage img { position: absolute; display: block; pointer-events: none; user-select: none; }
+
+/* bóng mềm dưới mèo (CSS thuần, không cần vẽ) */
+.cat-stage::before {
+  content: ""; position: absolute; left: 8%; right: 8%; bottom: -1%; height: 7%;
+  background: radial-gradient(ellipse at center, rgba(40, 25, 15, 0.38), rgba(40, 25, 15, 0) 70%);
+  filter: blur(1px);
+}
+
+.cat-pose { position: absolute; inset: 0; opacity: 0; transition: opacity 0.4s ease; }
+.cat[data-pose="sleep"] .cat-sleep, .cat[data-pose="awake"] .cat-awake { opacity: 1; }
+
+/* ---------- pose NGỦ ---------- */
+.cat-sleep-body { left: 5.52%; top: 37.93%; width: 88.62%; height: 61.38%; transform-origin: 50% 100%; animation: catBreathe 4s ease-in-out infinite; }
+@keyframes catBreathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.012, 1.035); } }
+
+.cat-z {
+  position: absolute; left: 33%; top: 36%; font: 800 clamp(9px, 1.2vw, 20px) "Segoe UI", -apple-system, sans-serif;
+  color: #fff; text-shadow: 0 1px 3px rgba(60, 40, 25, 0.55); opacity: 0; pointer-events: none;
+}
+.cat[data-pose="sleep"] .cat-z { animation: catZ 3.6s ease-in infinite; }
+.cat[data-pose="sleep"] .z2 { animation-delay: 1.2s; }
+.cat[data-pose="sleep"] .z3 { animation-delay: 2.4s; }
+@keyframes catZ {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.7); }
+  15%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(60%, -170%) scale(1.25) rotate(12deg); }
+}
+
+/* ---------- pose THỨC (toạ độ gốc: tail 179,98 · body 36,84 · head 27,2) ---------- */
+.cat-awake-tail { left: 61.72%; top: 33.79%; width: 28.97%; height: 52.76%; transform-origin: 38% 80%; animation: catTail 2.6s ease-in-out infinite; }
+.cat-awake-body { left: 12.41%; top: 28.97%; width: 61.72%; height: 70.34%; transform-origin: 50% 100%; animation: catSit 4.5s ease-in-out infinite; }
+.cat-awake-head { left: 9.31%; top: 0.69%; width: 61.38%; height: 50%; transform-origin: 50% 92%; animation: catHead 7s ease-in-out infinite; }
+@keyframes catTail { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(9deg); } }
+@keyframes catSit { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.01, 1.02); } }
+@keyframes catHead {
+  0%, 55%, 100% { transform: rotate(0deg); }
+  62%, 72% { transform: rotate(-5deg) translateY(0.5%); }   /* nghiêng đầu */
+  80% { transform: rotate(0deg); }
+}
+
+/* vươn vai khi bắt đầu nghỉ (giả bằng scale) */
+.cat.stretch .cat-awake-body { animation: catStretchBody 1.6s ease-in-out 1; }
+.cat.stretch .cat-awake-head { animation: catStretchHead 1.6s ease-in-out 1; }
+@keyframes catStretchBody { 0%, 100% { transform: scale(1, 1); } 40%, 65% { transform: scale(1.06, 0.93); } }
+@keyframes catStretchHead { 0%, 100% { transform: translateY(0) rotate(0); } 40%, 65% { transform: translateY(7%) rotate(6deg); } }
+
+/* ---------- bong bóng + tim ---------- */
+.cat-bubble {
+  position: absolute; left: 50%; bottom: 97%; transform: translate(-50%, 6px); z-index: 3;
+  width: max-content; max-width: 150%; padding: 0.4em 0.8em; border-radius: 12px;
+  background: #fff; color: #2b2b2e; text-align: center; line-height: 1.3; white-space: nowrap;
+  font: 600 clamp(9px, 0.85vw, 14px) -apple-system, "Segoe UI", sans-serif;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.25); opacity: 0; pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.cat[data-pose="sleep"] .cat-bubble { bottom: 62%; }
+.cat-bubble.show { opacity: 1; transform: translate(-50%, 0); }
+.cat-bubble::after { content: ""; position: absolute; left: 50%; top: 100%; margin-left: -6px; border: 6px solid transparent; border-top-color: #fff; }
+.cat-heart {
+  position: absolute; left: 50%; top: 25%; z-index: 4; pointer-events: none; font-size: clamp(12px, 1.5vw, 24px);
+  animation: catHeart 1.2s ease-out forwards;
+}
+@keyframes catHeart {
+  0%   { opacity: 0; transform: translate(-50%, 0) scale(0.6); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--hx, 0px)), -90px) scale(1.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-stage *, .cat-stage { animation: none !important; }
+}
+/* Hộp ngoài trùng khít với .alarm (cùng left/top/width/height). Chỉ cần chỉnh 4 biến bên dưới cho chữ nằm vừa màn hình. */
+.alarm-clock {
+  --clock-left: 17%; --clock-top: 14%; --clock-w: 64%; --clock-h: 56%;   /* vị trí + cỡ màn hình, tính theo hộp alarm */
+  --clock-rotate: 13deg;                                                  /* nghiêng theo thiết bị: số dương = nghiêng xuống bên phải */
+  position: absolute; left: 74.37%; top: 80.85%; width: 11.73%; height: 12.30%;
+  z-index: 4; pointer-events: none;
+}
+.alarm-clock-screen {
+  position: absolute; left: var(--clock-left); top: var(--clock-top); width: var(--clock-w); height: var(--clock-h);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2%;
+  transform: rotate(var(--clock-rotate)); transform-origin: center;
+  color: rgba(255, 255, 255, 0.9); text-align: center; white-space: nowrap;
+  font-family: -apple-system, "Segoe UI", sans-serif; font-variant-numeric: tabular-nums;
+  font-size: calc(var(--fit-w) * 0.0215);   /* cỡ chữ theo bề rộng phòng, nên co giãn cùng cửa sổ */
+}
+.clock-time { font-weight: 600; line-height: 1; letter-spacing: 0.02em; }
+.clock-time small { font-size: 0.4em; font-weight: 600; margin-left: 0.25em; opacity: 0.7; letter-spacing: 0.05em; }
+.clock-date { font-size: 0.34em; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.08em; }
+/* ===================== GHÉP BUDDY (match.js) ===================== */
+.find-buddy {
+  position: fixed; top: 52px; right: 12px; z-index: 60;
+  padding: 8px 16px; border: none; border-radius: 999px;
+  background: #fff; color: #2b2b2e; cursor: pointer;
+  font-family: -apple-system, "Segoe UI", sans-serif; font-size: 13px; font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.find-buddy:hover { background: #f1f1f4; }
+.find-buddy.searching { background: #ffe9a8; }
+
+.match-overlay[hidden] { display: none; }
+.match-overlay {
+  position: fixed; inset: 0; z-index: 80; display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.5); padding: 16px;
+}
+.match-card {
+  position: relative; width: min(420px, 100%); max-height: 100%; overflow-y: auto;
+  padding: 22px 22px 18px; border-radius: 18px; background: #fdf6e3; color: #4a3f2a;
+  font-family: -apple-system, "Segoe UI", sans-serif; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+.match-card h3 { font-size: 18px; margin-bottom: 6px; }
+.match-sub { font-size: 13px; line-height: 1.45; color: #6b5d42; margin-bottom: 14px; }
+.match-label { font-size: 12px; font-weight: 700; color: #6b5d42; margin-bottom: 6px; }
+.match-close {
+  position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: none; border-radius: 50%;
+  background: rgba(0, 0, 0, 0.07); color: #4a3f2a; font-size: 18px; cursor: pointer;
+}
+.match-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.match-chips.disabled { opacity: 0.55; pointer-events: none; }
+.match-chips .chip {
+  padding: 6px 12px; border: 2px solid #e8dcc0; border-radius: 999px; background: #fff; color: #6b5d42;
+  font-size: 12.5px; font-weight: 600; cursor: pointer;
+}
+.match-chips .chip.active { background: #6bc26b; border-color: #6bc26b; color: #fff; }
+.match-near { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 12px; cursor: pointer; }
+.match-status { min-height: 1.4em; font-size: 13px; font-weight: 600; color: #3d7d3d; margin-bottom: 10px; }
+.match-actions { display: flex; gap: 8px; }
+.match-actions button[hidden] { display: none; }
+.match-actions button {
+  padding: 10px 22px; border: none; border-radius: 999px; background: #6bc26b; color: #fff;
+  font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 3px 0 #4a9a4a;
+}
+.match-actions button.ghost { background: rgba(0, 0, 0, 0.08); color: #4a3f2a; box-shadow: none; }
+.match-privacy { margin-top: 12px; font-size: 11px; line-height: 1.4; color: #8a7c60; }
+
+/* ===================== ĐIỆN THOẠI / MÁY TÍNH BẢNG + BÀN PHÍM ===================== */
+/* focus bằng bàn phím (Tab): mọi thứ bấm được đều thấy viền */
+.clickable:focus-visible, .cat-stage:focus-visible { outline: 3px solid #4f8ef7; outline-offset: 3px; border-radius: 8px; }
+button { -webkit-tap-highlight-color: transparent; }
+
+/* tap vào buddy để xem motto (điện thoại không có hover) */
+.buddy-motto-bubble.tap-show { opacity: 1; transform: translateY(0); }
+
+/* gợi ý xoay ngang trên điện thoại dọc */
+.rotate-hint { display: none; }
+@media (orientation: portrait) and (max-width: 700px) {
+  .rotate-hint {
+    position: fixed; left: 50%; bottom: calc(56px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 70;
+    display: flex; align-items: center; gap: 8px; max-width: calc(100vw - 24px);
+    padding: 8px 8px 8px 14px; border-radius: 999px; background: rgba(0, 0, 0, 0.72); color: #fff;
+    font: 600 13px -apple-system, "Segoe UI", sans-serif; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  }
+  .rotate-hint button { width: 26px; height: 26px; border: none; border-radius: 50%; background: rgba(255, 255, 255, 0.2); color: #fff; font-size: 15px; cursor: pointer; }
+}
+
+/* cảm ứng: kéo thả đồ vật không bị trình duyệt cướp thành cuộn trang; nút to hơn; chữ ô nhập >= 16px (iOS không tự phóng to) */
+@media (pointer: coarse) {
+  .scene.edit-mode .decor-item { touch-action: none; }
+  .scene.edit-mode .decor-item .resize-handle { width: 26px; height: 26px; right: -12px; bottom: -12px; }
+  .goal-bar input, .chat-input-row input, .profile-input, .setting-row input[type="number"] { font-size: 16px; }
+  .timer-controls button, .mode-tab, .category-tab, .chat-input-row button, .sum-actions button { min-height: 44px; }
+  .picker-row.swatches .picker-thumb { width: 36px; height: 36px; }
+  .btn-close { width: 40px; height: 40px; }
+}
+
+/* màn hình nhỏ (điện thoại, tablet nhỏ): nút gọn lại, cửa sổ iPad thành toàn màn hình và co theo vùng nhìn thấy khi bàn phím mở */
+@media (max-width: 900px), (max-height: 560px) {
+  #btnToggleEditDesk, .copy-link, .find-buddy, .sound-toggle { font-size: 11.5px; padding: 6px 11px; }
+  #btnToggleEditDesk { top: max(8px, env(safe-area-inset-top)); left: max(8px, env(safe-area-inset-left)); }
+  .copy-link { top: max(8px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); }
+  .find-buddy { top: max(8px, env(safe-area-inset-top)); right: calc(max(8px, env(safe-area-inset-right)) + 128px); }
+  .sound-toggle { left: max(8px, env(safe-area-inset-left)); bottom: max(8px, env(safe-area-inset-bottom)); }
+
+  .ipad-overlay {                       /* --vv-top / --vv-h do mobile.js cập nhật từ visualViewport */
+    position: fixed; inset: auto; top: var(--vv-top, 0px); left: 0; width: 100vw; height: var(--vv-h, var(--vh-unit));
+    background: #111214; align-items: stretch;
+  }
+  .ipad-frame {
+    width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; padding: 0; background: #111214; box-shadow: none;
+    transform: none; opacity: 0; transition: opacity 0.2s ease;
+  }
+  .ipad-overlay.open .ipad-frame { opacity: 1; }
+  .ipad-content {
+    border-radius: 0; gap: 10px;
+    padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  }
+  .mode-tabs { padding-right: 44px; }   /* chừa chỗ cho nút đóng */
+  .btn-close { top: max(10px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right)); }
+  .mode-tab { font-size: 12px; }
+  body.popup-open #btnToggleEditDesk, body.popup-open .copy-link, body.popup-open .find-buddy,
+  body.popup-open .sound-toggle, body.popup-open .rotate-hint { display: none; }
+}
+@media (max-height: 560px) {            /* điện thoại xoay ngang: panel thấp, cho cuộn */
+  .ipad-content { gap: 8px; }
+  #stopwatchDisplay, #pomodoroDisplay { font-size: 34px; }
+  .nudge-message { position: static; }
+  body.typing .mode-tabs, body.typing .chat-status, body.typing .buddy-goal-line { display: none; }   /* đang gõ + bàn phím mở: nhường chỗ cho ô nhập */
+  body.typing .chat-log { min-height: 40px; }
+}

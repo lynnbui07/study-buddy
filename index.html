@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#4a3a2f">
+  <title>Study Buddy</title>
+  <link rel="icon" type="image/svg+xml" href="assets/cat/cat%20awake%20head.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="scene" id="scene">
+    <button id="btnToggleEditDesk">✏️ Customize Desk</button>
+    <button class="sound-toggle" id="btnSound">🔇 Rain sound: off</button>
+    <button class="copy-link" id="btnCopyLink">🔗 Invite a buddy</button>
+    <button class="find-buddy" id="btnFindBuddy">🤝 Find a buddy</button>
+
+    <!-- Ghép buddy (match.js) -->
+    <div class="match-overlay" id="matchOverlay" hidden>
+      <div class="match-card" role="dialog" aria-modal="true" aria-labelledby="matchTitle">
+        <button class="match-close" id="matchClose" aria-label="Close">×</button>
+        <h3 id="matchTitle">Find a study buddy</h3>
+        <p class="match-sub">Study side by side, without the small talk. Chat stays locked while either of you is focusing.</p>
+        <p class="match-label">What are you working on?</p>
+        <div class="match-chips" id="matchChips">
+          <button type="button" class="chip active" data-topic="any">Anything</button>
+          <button type="button" class="chip" data-topic="exams">Exams (AP / SAT)</button>
+          <button type="button" class="chip" data-topic="college">College</button>
+          <button type="button" class="chip" data-topic="language">Languages</button>
+          <button type="button" class="chip" data-topic="coding">Coding</button>
+        </div>
+        <label class="match-near"><input type="checkbox" id="matchNear" checked> Similar time zone only (within 3 hours)</label>
+        <p class="match-status" id="matchStatus" aria-live="polite"></p>
+        <div class="match-actions">
+          <button type="button" id="matchGo">Start looking</button>
+          <button type="button" id="matchStop" class="ghost" hidden>Stop looking</button>
+        </div>
+        <p class="match-privacy">While you look, only your room code, time zone and topic are visible to other seekers. Starting from an idle timer is best: joining a buddy reloads the page.</p>
+      </div>
+    </div>
+
+    <div class="background">
+      <img src="assets/background/table.svg" class="layer table" alt="table">
+      <img src="assets/background/wall.svg" class="layer wall" alt="wall">
+
+      <div class="layer sky" id="sky">
+        <div class="weather-fx" id="weatherFx"></div>
+      </div>
+
+      <img src="assets/background/window.svg" class="layer window" alt="window">
+      <img src="assets/background/door.svg" class="layer door" alt="door">
+      <img src="assets/background/shelf.svg" class="layer shelf" alt="shelf">
+      <img src="assets/background/rubic.svg" class="layer rubic" alt="rubic">
+      <img src="assets/background/roof.svg" class="layer roof" alt="roof">
+      <img src="assets/background/plant 4.svg" class="layer plant-4" alt="plant 4">
+      <img src="assets/background/plant 3.svg" class="layer plant-3" alt="plant 3">
+      <img src="assets/background/plant 2.svg" class="layer plant-2" alt="plant 2">
+      <img src="assets/background/plant 1.svg" class="layer plant-1" alt="plant 1">
+      <img src="assets/background/picture 3.svg" class="layer picture-3" alt="picture 3">
+      <img src="assets/background/picture 2.svg" class="layer picture-2" alt="picture 2">
+      <img src="assets/background/picture 1.svg" class="layer picture-1" alt="picture 1">
+
+      <!-- Đèn bàn lớn — click để bật/tắt (tự bật khi trời tối/mưa) -->
+      <div class="layer lamp-wrapper clickable" id="lampWrapper">
+        <img src="assets/background/lamp 2.svg" class="lamp-img" alt="desk lamp">
+        <div class="lamp-light-beam" id="lampBeam"></div>
+      </div>
+
+      <img src="assets/background/lamp 1.svg" class="layer lamp-1" alt="lamp 1">
+
+      <div class="layer group-plant-5 decor-item" data-item-id="groupplant5">
+        <img src="assets/background/group plant 5.svg" class="decor-img" alt="group plant 5">
+        <span class="resize-handle"></span>
+      </div>
+      <div class="layer group-pencilcase decor-item" data-item-id="pencilcase">
+        <img src="assets/background/group pencilcase.svg" class="decor-img" alt="group pencilcase">
+        <span class="resize-handle"></span>
+      </div>
+      <div class="layer group-cup decor-item" data-item-id="groupCup">
+        <img src="assets/background/group cup.svg" class="decor-img" alt="group cup">
+        <span class="resize-handle"></span>
+      </div>
+
+      <img src="assets/background/earth.svg" class="layer earth" alt="earth">
+      <img src="assets/background/cup 1.svg" class="layer cup-1" alt="cup 1">
+      <img src="assets/background/cap.svg" class="layer cap" alt="cap">
+      <img src="assets/background/cabinet.svg" class="layer cabinet" alt="cabinet">
+      <img src="assets/background/box.svg" class="layer box" alt="box">
+      <img src="assets/background/bookshelf.svg" class="layer bookshelf" alt="bookshelf">
+
+      <div class="layer book-9 decor-item" data-item-id="book9">
+        <img src="assets/background/book 9.svg" class="decor-img" alt="book 9">
+        <span class="resize-handle"></span>
+      </div>
+      <div class="layer book-8 decor-item" data-item-id="book8">
+        <img src="assets/background/book 8.svg" class="decor-img" alt="book 8">
+        <span class="resize-handle"></span>
+      </div>
+
+      <img src="assets/background/book 7.svg" class="layer book-7" alt="book 7">
+      <img src="assets/background/book 6.svg" class="layer book-6" alt="book 6">
+      <img src="assets/background/book 5.svg" class="layer book-5" alt="book 5">
+      <img src="assets/background/book 4.svg" class="layer book-4" alt="book 4">
+      <img src="assets/background/book 3.svg" class="layer book-3" alt="book 3">
+      <img src="assets/background/book 2.svg" class="layer book-2" alt="book 2">
+      <img src="assets/background/book 1.svg" class="layer book-1" alt="book 1">
+
+      <div class="layer book-10 decor-item" data-item-id="book10">
+        <img src="assets/background/book 10.svg" class="decor-img" alt="book 10">
+        <span class="resize-handle"></span>
+      </div>
+      <div class="layer book-11 decor-item" data-item-id="book11">
+        <img src="assets/background/book 11.svg" class="decor-img" alt="book 11">
+        <span class="resize-handle"></span>
+      </div>
+
+      <img src="assets/background/board.svg" class="layer board" alt="board">
+      <img src="assets/background/bed.svg" class="layer bed" alt="bed">
+      <img src="assets/background/bag.svg" class="layer bag" alt="bag">
+      <img src="assets/background/alarm.svg" class="layer alarm" alt="alarm">
+      <div class="alarm-clock" aria-label="Current time">
+        <div class="alarm-clock-screen">
+          <div class="clock-time"><span id="clockTime">--:--</span><small id="clockPeriod"></small></div>
+          <div class="clock-date" id="clockDate"></div>
+        </div>
+      </div>
+      <img src="assets/background/hook.svg" class="layer hook" alt="hook">
+
+      <!-- iPad trên bàn -->
+      <div class="layer ipad-wrapper clickable" id="ipadWrapper">
+        <img src="assets/background/ipad.svg" class="ipad-img" alt="ipad">
+        <div class="ipad-mini-screen" id="ipadMiniScreen">
+          <span id="miniTimerDisplay">00:00</span>
+          <span id="miniPhaseLabel" hidden></span>
+        </div>
+        <div class="ipad-bubble" id="ipadBubble"></div>
+        <span class="notif-badge" id="notifBadge"></span>
+      </div>
+
+      <!-- Mèo mascot: ngủ khi bạn đang focus, thức khi nghỉ / rảnh. Kéo & đổi cỡ được trong Customize Desk -->
+      <div class="layer cat decor-item" id="catPet" data-item-id="cat" data-pose="awake">
+        <div class="cat-stage" id="catStage" role="img" aria-label="Your study cat">
+          <div class="cat-pose cat-sleep">
+            <img class="cat-sleep-body" src="assets/cat/cat sleep body.svg" alt="" draggable="false">
+            <span class="cat-z z1">z</span><span class="cat-z z2">z</span><span class="cat-z z3">Z</span>
+          </div>
+          <div class="cat-pose cat-awake">
+            <img class="cat-awake-tail" src="assets/cat/cat awake tail.svg" alt="" draggable="false">
+            <img class="cat-awake-body" src="assets/cat/cat awake body.svg" alt="" draggable="false">
+            <img class="cat-awake-head" src="assets/cat/cat awake head.svg" alt="" draggable="false">
+          </div>
+          <div class="cat-bubble" id="catBubble"></div>
+        </div>
+        <span class="resize-handle"></span>
+      </div>
+
+      <!-- Bàn tay viết — chỉ hiện khi đang học -->
+      <div class="layer my-hand decor-item" id="myHandOverlay" data-item-id="myHand">
+        <div class="avatar-slot" id="myHandSlot"></div>
+        <span class="resize-handle"></span>
+      </div>
+
+      <!-- Tay buddy đang viết: dùng lại my hand.svg (xoay 180° vì buddy ngồi đối diện), đổi màu theo da của buddy -->
+      <div class="layer buddy-hand decor-item" id="buddyHand" data-item-id="buddyHand">
+        <div class="avatar-slot" id="buddyHandSlot"></div>
+        <span class="resize-handle"></span>
+      </div>
+
+      <!-- Avatar bạn học cùng — ngồi đối diện qua bàn -->
+      <div class="layer buddy-across-desk decor-item" id="buddyAvatar" data-item-id="buddy">
+        <div class="avatar-slot" id="buddySlot"></div>
+        <div class="buddy-status-badge" id="buddyStatusBadge"></div>
+        <div class="buddy-goal-note" id="buddyGoalNote" hidden></div>
+        <div class="buddy-name-tag" id="buddyNameTag"></div>
+        <div class="buddy-hover-zone" id="buddyHoverZone"></div>
+        <div class="buddy-motto-bubble" id="buddyMotto"></div>
+        <span class="resize-handle"></span>
+      </div>
+    </div>
+
+    <!-- Overlay tối theo giờ/thời tiết -->
+    <div class="room-ambient-overlay"></div>
+
+    <!-- iPad popup -->
+    <div class="ipad-overlay" id="ipadOverlay">
+      <div class="ipad-frame" id="ipadScreen">
+        <div class="ipad-content">
+          <button class="btn-close" id="btnClose">×</button>
+
+          <div class="mode-tabs">
+            <button class="mode-tab active" id="tabFlow">Flow Mode</button>
+            <button class="mode-tab" id="tabPomodoro">Pomodoro Mode</button>
+            <button class="mode-tab" id="tabProfile">Profile</button>
+            <button class="mode-tab" id="tabChat">Chat<span class="tab-dot" id="chatDot" hidden></span></button>
+          </div>
+
+          <div class="goal-bar" id="goalBar">
+            <input id="goalInput" type="text" enterkeyhint="done" maxlength="60" placeholder="🎯 What will you focus on?" autocomplete="off">
+            <p class="buddy-goal-line" id="buddyGoalLine" hidden></p>
+          </div>
+
+          <!-- Flow Mode -->
+          <div class="mode-panel" id="panelFlow">
+            <p id="stopwatchDisplay">00:00</p>
+            <div class="timer-controls">
+              <button id="btnStart">Start</button>
+              <button id="btnStop">Stop</button>
+              <button id="btnReset">Reset</button>
+            </div>
+            <label class="auto-suggest-toggle" for="autoSuggestToggle">
+              <input type="checkbox" id="autoSuggestToggle">
+              <span class="toggle-box"></span>
+              <span class="toggle-label">Auto-suggest break time</span>
+            </label>
+            <div class="nudge-message" id="nudgeMessage" hidden></div>
+          </div>
+
+          <!-- Pomodoro Mode -->
+          <div class="mode-panel" id="panelPomodoro" hidden>
+            <p class="phase-label" id="phaseLabel">Ready</p>
+            <p id="pomodoroDisplay">45:00</p>
+            <p class="cycle-label" id="cycleLabel">Cycle 1 / 4</p>
+            <div class="timer-controls">
+              <button id="btnPomodoroStart">Start</button>
+              <button id="btnPomodoroStop">Stop</button>
+              <button id="btnPomodoroReset">Reset</button>
+            </div>
+            <div class="pomodoro-settings">
+              <div class="setting-row">
+                <label for="focusMinutes">Focus time</label>
+                <input type="number" id="focusMinutes" value="45" min="1" max="120">
+                <span class="unit">min</span>
+              </div>
+              <div class="setting-row">
+                <label for="breakMinutes">Break time</label>
+                <input type="number" id="breakMinutes" value="5" min="1" max="60">
+                <span class="unit">min</span>
+              </div>
+              <div class="setting-row">
+                <label for="longBreakMinutes">Long break</label>
+                <input type="number" id="longBreakMinutes" value="15" min="1" max="60">
+                <span class="unit">min</span>
+              </div>
+              <div class="setting-row">
+                <label for="repeatCount">Repeat</label>
+                <input type="number" id="repeatCount" value="4" min="1" max="10">
+                <span class="unit">cycles</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile -->
+          <div class="mode-panel" id="panelProfile" hidden>
+            <div class="profile-layout">
+              <div class="profile-avatar-col">
+                <div class="avatar-preview" id="avatarPreview"></div>
+              </div>
+
+              <div class="profile-controls-col">
+                <div class="category-tabs">
+                  <button class="category-tab active" data-category="hair">Hair</button>
+                  <button class="category-tab" data-category="face">Face</button>
+                  <button class="category-tab" data-category="skin">Skin</button>
+                  <button class="category-tab" data-category="outfit">Outfit</button>
+                  <button class="category-tab" data-category="name">Name</button>
+                </div>
+
+                <div class="category-panel" id="categoryHair">
+                  <div class="picker-row" id="hairPicker"></div>
+                  <div class="picker-row swatches" id="hairColorPicker"></div>
+                </div>
+                <div class="category-panel" id="categoryFace" hidden>
+                  <div class="picker-row" id="facePicker"></div>
+                </div>
+                <div class="category-panel" id="categorySkin" hidden>
+                  <div class="picker-row swatches" id="skinColorPicker"></div>
+                </div>
+                <div class="category-panel" id="categoryOutfit" hidden>
+                  <div class="picker-row" id="outfitPicker"></div>
+                  <div class="picker-row swatches" id="outfitColorPicker"></div>
+                </div>
+                <div class="category-panel" id="categoryName" hidden>
+                  <label class="field-label" for="nameInput">Name (shown above your head)</label>
+                  <input class="profile-input" id="nameInput" type="text" enterkeyhint="done" maxlength="16" placeholder="Your name" autocomplete="off">
+                  <label class="field-label" for="mottoInput">Motto / status (shows when buddy hovers over you)</label>
+                  <input class="profile-input" id="mottoInput" type="text" enterkeyhint="done" maxlength="50" placeholder="Locking in for AP exams!" autocomplete="off">
+                </div>
+              </div>
+            </div>
+
+            <button id="btnSaveAvatar">Confirm</button>
+          </div>
+
+          <!-- Chat (chỉ mở khi nghỉ / chưa học / hết phiên) -->
+          <div class="mode-panel chat-panel" id="panelChat" hidden>
+            <p class="chat-status" id="chatStatus"></p>
+            <div class="chat-locked" id="chatLocked" hidden>🔒 Focus time. Messages will wait for your break.</div>
+            <div class="chat-body" id="chatBody">
+              <div class="chat-log" id="chatLog"></div>
+              <div class="chat-input-row">
+                <input id="chatInput" type="text" enterkeyhint="send" maxlength="200" placeholder="Say something to your buddy..." autocomplete="off">
+                <button id="chatSend">Send</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recap cuối phiên -->
+          <div class="mode-panel summary-panel" id="panelSummary" hidden>
+            <h3>Session complete 🎉</h3>
+            <p class="sum-big" id="sumTime"></p>
+            <p class="sum-line" id="sumDetail"></p>
+            <div class="sum-goal" id="sumGoal" hidden>
+              <p id="sumGoalText"></p>
+              <div class="sum-actions" id="sumGoalActions">
+                <button id="sumDone">✅ Done</button>
+                <button id="sumNotYet" class="ghost">Not yet</button>
+              </div>
+            </div>
+            <p class="sum-line" id="sumStreak"></p>
+            <div class="sum-actions">
+              <button id="sumChat">💬 Chat with buddy</button>
+              <button id="sumClose" class="ghost">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="cat.js"></script>
+  <script src="mobile.js"></script>
+  <script type="module" src="Timer.js"></script>
+  <script type="module" src="extras.js"></script>
+  <script type="module" src="match.js"></script>
+</body>
+</html>
