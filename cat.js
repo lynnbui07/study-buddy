@@ -2,7 +2,7 @@
 // Không import gì cả: nếu Firebase lỗi mạng thì mèo vẫn chạy.
 // Nghe sự kiện "sb:status" do Timer.js phát ra: studying/focusing -> ngủ; còn lại -> thức.
 (() => {
-  const CAT_NAME = 'Pomo';                                   // <-- đổi tên mèo ở đây
+  const CAT_NAME = 'Pomo';                                   
   const cat = document.getElementById('catPet');
   const stage = document.getElementById('catStage');
   const bubble = document.getElementById('catBubble');
