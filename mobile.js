@@ -67,12 +67,14 @@
   }
 
   // 6) ô nhập luôn nằm trong tầm nhìn khi bàn phím ảo mở
-  document.addEventListener('focusin', (e) => {
-    if (!e.target.matches?.('input, textarea')) return;
-    if (e.target.closest('.ipad-content')) document.body.classList.add('typing');   // CSS dùng để nhường chỗ khi điện thoại xoay ngang
-    setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
-  });
   document.addEventListener('focusout', () => {
-    setTimeout(() => { if (!document.activeElement?.matches?.('input, textarea')) document.body.classList.remove('typing'); }, 60);
+    setTimeout(() => {
+      if (!document.activeElement?.matches?.('input, textarea')) {
+        document.body.classList.remove('typing');
+        // trình duyệt có thể tự cuộn khung phòng khi ô nhập được focus -> trả về vị trí gốc
+        document.querySelector('.scene')?.scrollTo(0, 0);
+        window.scrollTo(0, 0);
+      }
+    }, 60);
   });
 })();
